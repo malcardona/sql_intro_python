@@ -54,8 +54,8 @@ def create_schema():
     conn.close()
 
 
-def fill():
-    print('Completemos esta tablita!')
+def fill(group):
+    print(' Agregando ... {}'.format(group))
     # Llenar la tabla de la secundaria con al menos 5 estudiantes
     # Cada estudiante tiene los posibles campos:
     # id --> este campo es auto incremental por lo que no deberá completarlo
@@ -67,6 +67,16 @@ def fill():
     # Se debe utilizar la sentencia INSERT.
     # Observar que hay campos como "grade" y "tutor" que no son obligatorios
     # en el schema creado, puede obivar en algunos casos completar esos campos
+    dat = sqlite3.connect('secundaria.db')
+    c = dat.cursor()
+
+    c.executemany("""
+        INSERT INTO estudiante (name, age, grade, tutor)
+        VALUES (?,?,?,?);""", group)
+
+    dat.commit()
+    # Cerrar la conexión con la base de datos
+    dat.close()
 
 
 def fetch():
@@ -74,22 +84,42 @@ def fetch():
     # Utilizar la sentencia SELECT para imprimir en pantalla
     # todas las filas con todas sus columnas
     # Utilizar fetchone para imprimir de una fila a la vez
+    dat = sqlite3.connect('secundaria.db')
+    c = dat.cursor()
+
+    for row in c.execute('SELECT * FROM estudiante'):
+        print(row)
+    # Cerrar la conexión con la base de datos
+    dat.close()
 
 
 def search_by_grade(grade):
     print('Operación búsqueda!')
     # Utilizar la sentencia SELECT para imprimir en pantalla
     # aquellos estudiantes que se encuentra en en año "grade"
+    dat = sqlite3.connect('secundaria.db')
+    c = dat.cursor()
 
     # De la lista de esos estudiantes el SELECT solo debe traer
     # las siguientes columnas por fila encontrada:
     # id / name / age
+    c.execute("SELECT id, name, age FROM estudiante WHERE grade =?", (grade,))
+    data = c.fetchall()
+    print(data)
+    dat.close()
 
 
-def insert(grade):
+def insert(v1, v2 , v3):
     print('Nuevos ingresos!')
     # Utilizar la sentencia INSERT para ingresar nuevos estudiantes
     # a la secundaria
+    dat = sqlite3.connect('secundaria.db')
+    c = dat.cursor()
+
+    c.executemany("""
+        INSERT INTO estudainte (name, age, grade)
+        VALUES (?,?,?);""", v1, v2, v3)
+    dat.close()
 
 
 def modify(id, name):
@@ -97,20 +127,66 @@ def modify(id, name):
     # Utilizar la sentencia UPDATE para modificar aquella fila (estudiante)
     # cuyo id sea el "id" pasado como parámetro,
     # modificar su nombre por "name" pasado como parámetro
+    dat = sqlite3.connect('secundaria.db')
+    c = dat.cursor()
+
+    c.execute("UPDATE estudiante SET name =? WHERE id =?", ( name, id, ))
+    dat.commit()
+    dat.close()
 
 
 if __name__ == '__main__':
     print("Bienvenidos a otra clase de Inove con Python")
     create_schema()   # create and reset database (DB)
-    # fill()
-    # fetch()
+
+    group1 = [('SALMAN, Facundo', 5, 1, 'Max',),
+             ('ASTUDILLO, Luciano', 7, 1, 'Max'),
+             ('CASTRO, Emmanuel', 6, 1,'Max'),
+             ]
+
+    group2 = [('AYBAR, Ana', 8, 1, 'Lewis',),
+             ('ALBORNOZ, Julieta', 8, 1, 'Lewis'),
+             ('BRUNO, Laura', 9, 1,'Lewis'),
+             ]
+
+    group3 = [('CABRAL, Jazmin', 10, 3, 'Valteri',),
+             ('FERLAUTO, Petra', 11, 3, 'Valteri'),
+             ('FLORES, Marcela', 12, 3,'Valteri'),
+             ]           
+
+    group4 = [('FRESCO, Adriana', 13, 4, 'Lando',),
+             ('MERCADO, Yamila', 13, 4, 'Lando'),
+             ('GONZALEZ, Miguel', 12, 4,'Lando'),
+             ]
+
+    group5 = [('GONZALEZ, Nadia', 14, 5, 'Checo',),
+             ('CARDENAS, Gaston', 14, 5, 'Checo'),
+             ('HERRERA, Jose', 15, 5,'Checo'),
+             ]
+
+    group6 = [('PUITA, Jonatha', 14, 5, 'Carlos',),
+             ('LORENZI, Fausto', 14, 5, 'Carlos'),
+             ('ALTAMIRANO, Sofia', 15, 5,'Carlos'),
+             ]
+
+    fill(group1)
+    fill(group2)
+    fill(group3)
+    fill(group4)
+    fill(group5)
+    fill(group6)
+
+    fetch()
 
     grade = 3
-    # search_by_grade(grade)
+    search_by_grade(grade)
 
-    new_student = ['You', 16]
+    new_student = ['You', 16, 4 ] 
     # insert(new_student)
 
-    name = '¿Inove?'
+    name = 'ASTUDILLO, Juan'
     id = 2
-    # modify(id, name)
+    modify(id, name)
+
+    fetch()
+

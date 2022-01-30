@@ -25,10 +25,9 @@ def create_schema():
     # Conectarnos a la base de datos
     # En caso de que no exista el archivo se genera
     # como una base de datos vacia
-    conn = sqlite3.connect('secundaria.db')
-
-    # Crear el cursor para poder ejecutar las querys
-    c = conn.cursor()
+    with sqlite3.connect('secundaria.db') as db:
+        # Crear el cursor para poder ejecutar las querys
+        c = db.cursor()
 
     # Ejecutar una query
     c.execute("""
@@ -48,11 +47,9 @@ def create_schema():
 
     # Para salvar los cambios realizados en la DB debemos
     # ejecutar el commit, NO olvidarse de este paso!
-    conn.commit()
+    db.commit()
 
-    # Cerrar la conexión con la base de datos
-    conn.close()
-
+    
 
 def fill(group):
     print(' Agregando ... {}'.format(group))
@@ -67,77 +64,75 @@ def fill(group):
     # Se debe utilizar la sentencia INSERT.
     # Observar que hay campos como "grade" y "tutor" que no son obligatorios
     # en el schema creado, puede obivar en algunos casos completar esos campos
-    dat = sqlite3.connect('secundaria.db')
-    c = dat.cursor()
+    with sqlite3.connect('secundaria.db') as db:
+        # Crear el cursor para poder ejecutar las querys
+        c = db.cursor()
 
     c.executemany("""
         INSERT INTO estudiante (name, age, grade, tutor)
         VALUES (?,?,?,?);""", group)
 
-    dat.commit()
-    # Cerrar la conexión con la base de datos
-    dat.close()
-
+    db.commit()
+    
 
 def fetch():
     print('Comprobemos su contenido, ¿qué hay en la tabla?')
     # Utilizar la sentencia SELECT para imprimir en pantalla
     # todas las filas con todas sus columnas
     # Utilizar fetchone para imprimir de una fila a la vez
-    dat = sqlite3.connect('secundaria.db')
-    c = dat.cursor()
+    with sqlite3.connect('secundaria.db') as db:
+        # Crear el cursor para poder ejecutar las querys
+        c = db.cursor()
 
     for row in c.execute('SELECT * FROM estudiante'):
         print(row)
-    # Cerrar la conexión con la base de datos
-    dat.close()
-
+    
 
 def search_by_grade(grade):
     print('Operación búsqueda!')
     # Utilizar la sentencia SELECT para imprimir en pantalla
     # aquellos estudiantes que se encuentra en en año "grade"
-    dat = sqlite3.connect('secundaria.db')
-    c = dat.cursor()
+    with sqlite3.connect('secundaria.db') as db:
+        # Crear el cursor para poder ejecutar las querys
+        c = db.cursor()
 
     # De la lista de esos estudiantes el SELECT solo debe traer
     # las siguientes columnas por fila encontrada:
     # id / name / age
     c.execute("SELECT id, name, age FROM estudiante WHERE grade =?", (grade,))
-    data = c.fetchall()
-    print(data)
-    dat.close()
-
+    query = c.fetchall()
+    print(query)
+    
 
 def insert(v1, v2 , v3):
     print('Nuevos ingresos!')
     # Utilizar la sentencia INSERT para ingresar nuevos estudiantes
     # a la secundaria
-    dat = sqlite3.connect('secundaria.db')
-    c = dat.cursor()
+    with sqlite3.connect('secundaria.db') as db:
+        # Crear el cursor para poder ejecutar las querys
+        c = db.cursor()
 
     c.executemany("""
         INSERT INTO estudainte (name, age, grade)
         VALUES (?,?,?);""", v1, v2, v3)
-    dat.close()
-
+   
 
 def modify(id, name):
     print('Modificando la tabla')
     # Utilizar la sentencia UPDATE para modificar aquella fila (estudiante)
     # cuyo id sea el "id" pasado como parámetro,
     # modificar su nombre por "name" pasado como parámetro
-    dat = sqlite3.connect('secundaria.db')
-    c = dat.cursor()
+    with sqlite3.connect('secundaria.db') as db:
+        # Crear el cursor para poder ejecutar las querys
+        c = db.cursor()
 
     c.execute("UPDATE estudiante SET name =? WHERE id =?", ( name, id, ))
-    dat.commit()
-    dat.close()
-
+    db.commit()
+    
 
 if __name__ == '__main__':
     print("Bienvenidos a otra clase de Inove con Python")
-    create_schema()   # create and reset database (DB)
+    create_schema()   # create and reset querybase (DB)
 
     group1 = [('SALMAN, Facundo', 5, 1, 'Max',),
              ('ASTUDILLO, Luciano', 7, 1, 'Max'),
